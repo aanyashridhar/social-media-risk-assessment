@@ -1,4 +1,4 @@
-"""Schemas for risk assessment records."""
+from __future__ import annotations
 
 from pydantic import BaseModel
 
@@ -10,3 +10,6 @@ class Record(BaseModel):
     author_id_hash: str
     created_at: str
     text: str
+    community: str | None = None
+    parent_record_id: str | None = None
+    thread_id: str | None = None
