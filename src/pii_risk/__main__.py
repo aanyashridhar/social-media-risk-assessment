@@ -5,6 +5,7 @@ import typer
 from pii_risk.pii.detector import detect_pii_spans, redact_text
 from pii_risk.pii.scoring import score_record
 
+from pii_risk.ingest.mastodon import ingest_mastodon
 from pii_risk.ingest.reddit import ingest_reddit
 from pii_risk.ml.combine import combined_score
 from pii_risk.ml.predict import predict_risk
@@ -20,6 +21,15 @@ def ingest_reddit_command(
     max_rows: int | None = typer.Option(None, "--max-rows", help="Max rows to ingest."),
 ) -> None:
     ingest_reddit(input, output, max_rows)
+
+
+@app.command("ingest-mastodon")
+def ingest_mastodon_command(
+    input: str = typer.Option(..., "--input", help="Path to JSONL or CSV file."),
+    output: str = typer.Option(..., "--output", help="Output directory."),
+    max_rows: int | None = typer.Option(None, "--max-rows", help="Max rows to ingest."),
+) -> None:
+    ingest_mastodon(input, output, max_rows)
 
 
 @app.command("analyze-text")
