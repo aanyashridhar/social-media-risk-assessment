@@ -12,6 +12,7 @@ pandas = "*"
 pyarrow = "*"
 pydantic = "*"
 regex = "*"
+scikit-learn = "*"
 typer = "*"
 tqdm = "*"
 

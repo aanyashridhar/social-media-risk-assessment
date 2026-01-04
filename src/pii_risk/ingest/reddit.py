@@ -54,7 +54,17 @@ def ingest_reddit(input_path: str, output_dir: str, max_rows: int | None = None)
             table,
             base_dir=output_dir,
             format="parquet",
-            partitioning=["platform", "record_type", "year", "month"],
+            partitioning=ds.partitioning(
+                pa.schema(
+                    [
+                        ("platform", pa.string()),
+                        ("record_type", pa.string()),
+                        ("year", pa.string()),
+                        ("month", pa.string()),
+                    ]
+                ),
+                flavor="hive",
+            ),
             existing_data_behavior="overwrite_or_ignore",
             basename_template=f"part-{file_counter:03d}-{{i}}.parquet",
         )
