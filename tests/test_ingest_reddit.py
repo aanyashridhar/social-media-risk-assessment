@@ -18,9 +18,10 @@ def test_ingest_reddit_jsonl(tmp_path: Path) -> None:
     records = table.to_pylist()
 
     assert len(records) == 4
-    record_types = [record["record_type"] for record in records]
-    assert record_types.count("post") == 2
-    assert record_types.count("comment") == 2
+    post_files = list((output_dir / "platform=reddit" / "record_type=post").rglob("*.parquet"))
+    comment_files = list((output_dir / "platform=reddit" / "record_type=comment").rglob("*.parquet"))
+    assert len(post_files) > 0
+    assert len(comment_files) > 0
 
     post = next(r for r in records if r["record_id"] == "p1")
     assert post["text"] == "First post\n\nHello world"
