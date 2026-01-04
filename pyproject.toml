@@ -2,7 +2,7 @@
 name = "social-media-risk-assessment"
 version = "0.1.0"
 description = "Bootstrap for social media risk assessment."
-authors = ["Your Name <you@example.com>"]
+authors = ["Aanya Shridhar <aanyashridhar@gmail.com>"]
 readme = "README.md"
 packages = [{ include = "pii_risk", from = "src" }]
 
