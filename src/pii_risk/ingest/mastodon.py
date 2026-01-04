@@ -17,6 +17,21 @@ from pii_risk.schema import Record
 
 
 HTML_TAG_RE = re.compile(r"<[^>]+>")
+MASTODON_PARQUET_SCHEMA = pa.schema(
+    [
+        ("platform", pa.string()),
+        ("record_type", pa.string()),
+        ("record_id", pa.string()),
+        ("author_id_hash", pa.string()),
+        ("created_at", pa.string()),
+        ("text", pa.string()),
+        ("community", pa.string()),
+        ("parent_record_id", pa.string()),
+        ("thread_id", pa.string()),
+        ("year", pa.string()),
+        ("month", pa.string()),
+    ]
+)
 
 
 def ingest_mastodon(input_path: str, output_dir: str, max_rows: int | None = None) -> None:
@@ -55,7 +70,7 @@ def ingest_mastodon(input_path: str, output_dir: str, max_rows: int | None = Non
         if not rows:
             return
 
-        table = pa.Table.from_pylist(rows)
+        table = pa.Table.from_pylist(rows, schema=MASTODON_PARQUET_SCHEMA)
         ds.write_dataset(
             table,
             base_dir=output_dir,
@@ -124,8 +139,12 @@ def _normalize_record(raw: dict[str, Any]) -> dict[str, Any] | None:
         return None
 
     community = _extract_community(raw)
-    parent_record_id = raw.get("in_reply_to_id") or None
-    thread_id = raw.get("conversation_id") or None
+    parent_record_id = raw.get("in_reply_to_id")
+    parent_record_id = str(parent_record_id) if parent_record_id not in (None, "") else None
+
+    thread_id = raw.get("conversation_id")
+    thread_id = str(thread_id) if thread_id not in (None, "") else None
+
 
     selected_text = content if content not in (None, "") else text
     cleaned_text = _normalize_text(selected_text)

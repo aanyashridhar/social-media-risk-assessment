@@ -4,6 +4,8 @@ from pathlib import Path
 
 import pyarrow.dataset as ds
 
+from datetime import datetime
+
 from pii_risk.ingest.mastodon import ingest_mastodon
 
 
@@ -28,7 +30,8 @@ def test_ingest_mastodon_jsonl(tmp_path: Path) -> None:
     base_partition = output_dir / "platform=mastodon" / "record_type=post"
     assert base_partition.exists()
 
-    january_partition = base_partition / "year=2025" / "month=01"
-    december_partition = base_partition / "year=2024" / "month=12"
-    assert january_partition.exists()
-    assert december_partition.exists()
+    for r in records:
+        dt = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
+        expected = base_partition / f"year={dt.year:04d}" / f"month={dt.month:02d}"
+        assert expected.exists()
+
