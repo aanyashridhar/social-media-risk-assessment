@@ -6,6 +6,9 @@ from pii_risk.pii.detector import detect_pii_spans, redact_text
 from pii_risk.pii.scoring import score_record
 
 from pii_risk.ingest.reddit import ingest_reddit
+from pii_risk.ml.combine import combined_score
+from pii_risk.ml.predict import predict_risk
+from pii_risk.ml.train import train_model
 
 app = typer.Typer(help="PII risk assessment tools.")
 
@@ -30,6 +33,35 @@ def analyze_text_command(
     typer.echo(f"score: {result['score']}")
     typer.echo(f"counts_by_type: {result['counts_by_type']}")
     typer.echo(f"redacted_text: {redacted}")
+
+
+@app.command("train-ml")
+def train_ml_command(
+    input: str = typer.Option(..., "--input", help="Path to Parquet dataset."),
+    max_rows: int | None = typer.Option(None, "--max-rows", help="Max rows to ingest."),
+) -> None:
+    train_model(input, max_rows=max_rows)
+
+
+@app.command("analyze-text-ml")
+def analyze_text_ml_command(
+    text: str = typer.Option(..., "--text", help="Text to analyze."),
+) -> None:
+    rules = score_record(text)
+    spans = detect_pii_spans(text)
+    redacted = redact_text(text, spans)
+    pii_types = sorted({span.type for span in spans})
+
+    ml_result = predict_risk(text)
+    combined = combined_score(rules["score"], ml_result["p_risk"])
+
+    typer.echo(f"rule_score: {rules['score']}")
+    typer.echo(f"p_risk: {ml_result['p_risk']:.3f}")
+    typer.echo(f"final_score: {combined['final_score']}")
+    typer.echo(f"interpretation: {combined['interpretation']}")
+    typer.echo(f"detected_pii_types: {pii_types}")
+    typer.echo(f"redacted_text: {redacted}")
+    typer.echo(f"top_terms: {ml_result['top_terms']}")
 
 
 def main() -> None:
