@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typer
 
+from pii_risk.eval.audit import audit_records
 from pii_risk.pii.detector import detect_pii_spans, redact_text
 from pii_risk.pii.scoring import score_record
 
@@ -72,6 +73,17 @@ def analyze_text_ml_command(
     typer.echo(f"detected_pii_types: {pii_types}")
     typer.echo(f"redacted_text: {redacted}")
     typer.echo(f"top_terms: {ml_result['top_terms']}")
+
+
+@app.command("audit-ml")
+def audit_ml_command(
+    input: str = typer.Option(..., "--input", help="Path to Parquet dataset."),
+    model: str = typer.Option(..., "--model", help="Path to model artifact or folder."),
+    out: str = typer.Option(..., "--out", help="Output CSV path."),
+    max_rows: int | None = typer.Option(None, "--max-rows", help="Max rows to scan."),
+    seed: int = typer.Option(0, "--seed", help="Seed for reproducibility."),
+) -> None:
+    audit_records(input, model, out, max_rows=max_rows, seed=seed)
 
 
 def main() -> None:
