@@ -9,13 +9,6 @@ from pii_risk.ml.predict import predict_risk
 from pii_risk.pii.detector import detect_pii_spans, redact_text
 from pii_risk.pii.scoring import score_record
 
-EXAMPLE_CAPTIONS = [
-    "DM me at alex.mercer88@example.com and I'll send the docs.",
-    "Call me at (415) 555-0199 after 6pm so we can coordinate.",
-    "My old address was 742 Evergreen Street and I forgot to update my profile.",
-    "Here is the server URL https://internal.example.org/status and my backup IP 10.0.0.42.",
-    "Totally harmless post: enjoying coffee and sunshine this morning!",
-]
 
 REQUIRED_MODEL_ARTIFACTS = ("pii_risk_model.pkl", "vectorizer.pkl")
 DIVIDER = "-" * 60
